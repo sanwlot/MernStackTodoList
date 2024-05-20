@@ -34,7 +34,6 @@ function App() {
       });
   }
   async function loadItems() {
-    console.log("Load Item");
     const response = await fetch("http://localhost:8787/tasks/");
     const data = await response.json();
     setTodoList(data);
@@ -123,10 +122,10 @@ function App() {
       />
       <button onClick={addItem}>Add</button>
       <ul className="todo-list-container">
-        <li className="todo-item">
-          {todoList.map((item) => {
-            return (
-              <div className="todo-item-container" key={item._id}>
+        {todoList.map((item) => {
+          return (
+            <li key={item._id} className="todo-item">
+              <div className="todo-item-container">
                 <div
                   className={
                     "todo-item-title" + (item.completed ? " done" : "")
@@ -140,7 +139,7 @@ function App() {
                     type="text"
                     className="update-input"
                     placeholder="Update Todo"
-                    value={updateInput}
+                    // value={updateInput}
                     onChange={(e) => setUpdateInput(e.target.value)}
                   />
                 </div>
@@ -149,9 +148,9 @@ function App() {
                   <button onClick={() => deleteItem(item._id)}>Delete</button>
                 </div>
               </div>
-            );
-          })}
-        </li>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
