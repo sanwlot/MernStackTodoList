@@ -15,12 +15,13 @@ const Task = mongoose.model("Task", taskSchema);
 main().catch((err) => console.log(err));
 
 async function main() {
-  await mongoose.connect("mongodb://127.0.0.1:27017/todoListDB");
+  await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to MongoDB");
 }
 
 const app = express();
 
+app.use(express.static("dist"));
 app.use(express.json());
 app.use(cors());
 
@@ -68,6 +69,11 @@ app.delete("/tasks/:id", async (req, res) => {
     res.status(500).send(err);
   }
 });
+
+//  for client side routing
+// app.use("*", (req, res) => {
+//   res.sendFile(__dirname + "/dist/index.html");
+// });
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);

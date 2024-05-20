@@ -2,7 +2,15 @@ import { useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
-  const [todoList, setTodoList] = useState([]);
+  interface TodoItem {
+    _id: string;
+    name: string;
+    completed: boolean;
+    date: string; // Added date property
+  }
+
+  const [todoList, setTodoList] = useState<TodoItem[]>([]);
+  // const [todoList, setTodoList] = useState([]);
   const [todoInput, setTodoInput] = useState("");
   const [updateInput, setUpdateInput] = useState("");
 
@@ -12,7 +20,7 @@ function App() {
 
   function addItem() {
     // add item to POST request
-    fetch("http://localhost:8787/tasks/", {
+    fetch("/tasks/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -34,13 +42,13 @@ function App() {
       });
   }
   async function loadItems() {
-    const response = await fetch("http://localhost:8787/tasks/");
+    const response = await fetch("/tasks/");
     const data = await response.json();
     setTodoList(data);
   }
-  function updateItem(id) {
+  function updateItem(id: string) {
     // update request with id
-    fetch(`http://localhost:8787/tasks/${id}`, {
+    fetch(`/tasks/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -58,9 +66,9 @@ function App() {
         console.log("Item Not Updated");
       });
   }
-  function deleteItem(id) {
+  function deleteItem(id: string) {
     // delete request with id
-    fetch(`http://localhost:8787/tasks/${id}`, {
+    fetch(`/tasks/${id}`, {
       method: "DELETE",
     })
       .then(() => {
@@ -73,7 +81,7 @@ function App() {
       });
   }
 
-  function toggleDoneClass(id) {
+  function toggleDoneClass(id: string) {
     // Find the item in the todo list
     const item = todoList.find((item) => item._id === id);
 
@@ -85,7 +93,7 @@ function App() {
     console.log(`Toggling item: ${item.name}, completed: ${item.completed}`);
 
     // Send PATCH request to update the item's completion status
-    fetch(`http://localhost:8787/tasks/${id}`, {
+    fetch(`/tasks/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
