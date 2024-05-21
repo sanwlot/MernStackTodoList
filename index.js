@@ -10,7 +10,16 @@ const taskSchema = new Schema({
   completed: { type: Boolean, default: false },
 });
 
+const userSchema = new Schema({
+  firstName: { type: String, required: true },
+  lastName: String,
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true, minLength: 6 },
+  token: String,
+});
+
 const Task = mongoose.model("Task", taskSchema);
+const User = mongoose.model("User", userSchema);
 
 main().catch((err) => console.log(err));
 
@@ -25,6 +34,7 @@ app.use(express.static("public"));
 app.use(express.json());
 app.use(cors());
 
+// tasks routes
 app.get("/tasks", async (req, res) => {
   const tasks = await Task.find();
   res.send(tasks);
@@ -70,10 +80,57 @@ app.delete("/tasks/:id", async (req, res) => {
   }
 });
 
-//  for client side routing
-// app.use("*", (req, res) => {
-//   res.sendFile(__dirname + "/dist/index.html");
-// });
+// users routes
+// create user
+app.post("/users", async (req, res) => {
+  const user = User(req.body);
+  try {
+    const data = await user.save();
+    res.send(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
+// get users
+app.get("/users", async (req, res) => {
+  const users = await User.find();
+  res.send(users);
+});
+
+// get user
+app.get("/users/:id", async (req, res) => {
+  const id = req.params.id;
+  const user = await User.findById(id);
+  res.json(user);
+});
+
+// update user
+app.patch("/users/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const data = await User.findByIdAndUpdate(id, req.body, { new: true });
+    if (!data) {
+      return res.status(404).send({ error: "User not found" });
+    }
+    res.send(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
+// delete user
+app.delete("/users/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const user = await User.findOneAndDelete({ _id: id });
+    res.status(201).json(user);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
